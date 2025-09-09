@@ -7,7 +7,7 @@
 يقوم بجلب بيانات الفيديو (العنوان + الوصف) مباشرة من **YouTube Data API** بعد تسجيل الدخول، ثم قراءتها صوتيًا.
 
 ## 🚀 كيفية الاستخدام
-1. افتح [رابط الصفحة](https://username.github.io/youtube-helper/) (غيّر `username` إلى اسم المستخدم في GitHub).  
+1. افتح [رابط الصفحة](https://mylhassane.github.io/youtube-helper/) (غيّر `mylhassane` إلى اسم المستخدم في GitHub).  
 2. اضغط على زر **🔑 تسجيل الدخول إلى يوتيوب** (OAuth مع Google).  
 3. بعد تسجيل الدخول، اضغط على زر **🎬 جلب آخر فيديو**.  
 4. ستظهر تفاصيل الفيديو (العنوان + الوصف) ويتم نطقها تلقائيًا.  
@@ -17,8 +17,8 @@
 - فعّل **YouTube Data API v3**.  
 - أنشئ **OAuth Client ID** من نوع **Web Application**.  
 - أضف رابط GitHub Pages إلى:
-  - Authorized JavaScript origins → `https://username.github.io`
-  - Authorized redirect URIs → `https://username.github.io/youtube-helper/`
+  - Authorized JavaScript origins → `https://mylhassane.github.io`
+  - Authorized redirect URIs → `https://mylhassane.github.io/youtube-helper/`
 - انسخ **Client ID** وضعه في ملف `index.html` مكان `YOUR_CLIENT_ID`.
 
 ## 🔒 الخصوصية
