@@ -1,75 +1,86 @@
-<script>
-  const CLIENT_ID = "453345351977-9k7c7fnh5pqfgpm3pmjq2obq6a481v3b.apps.googleusercontent.com";
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Helper</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <button id="login">🔑 تسجيل الدخول إلى يوتيوب</button>
+  <button id="get">🎬 جلب آخر فيديو</button>
+  <pre id="output"></pre>
+
+  <script>
+const CLIENT_ID = "453345351977-9k7c7fnh5pqfgpm3pmjq2obq6a481v3b.apps.googleusercontent.com";
   const API_KEY = "AIzaSyDAfXNsg1Kk5cUkg__ToE13fqVp3NeUPCI"; // أضف المفتاح هنا
-  const SCOPES = "https://www.googleapis.com/auth/youtube.readonly";
+    const SCOPES = "https://www.googleapis.com/auth/youtube.readonly";
 
-  function loadClient() {
-    gapi.client.setApiKey(API_KEY); // ✅ نضيف المفتاح
-    return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest");
-  }
-
-  function initClient() {
-    gapi.auth2.init({
-      client_id: CLIENT_ID,
-      scope: SCOPES
-    });
-  }
-
-  document.getElementById("login").onclick = async () => {
-    await gapi.auth2.getAuthInstance().signIn();
-    alert("تم تسجيل الدخول ✅");
-  };
-
-  document.getElementById("get").onclick = async () => {
-    try {
-      // آخر نشاط (قد يكون مشاهدة، تعليق، رفع، إلخ)
-      const response = await gapi.client.youtube.activities.list({
-        part: "snippet,contentDetails",
-        mine: true,
-        maxResults: 1
-      });
-
-      console.log("Activities response:", response);
-
-      const item = response.result.items[0];
-      let vidId = null;
-
-      if (item.contentDetails.upload) {
-        vidId = item.contentDetails.upload.videoId;
-      } else if (item.contentDetails.playlistItem) {
-        vidId = item.contentDetails.playlistItem.resourceId.videoId;
-      } else if (item.contentDetails.recommendation) {
-        vidId = item.contentDetails.recommendation.resourceId.videoId;
-      }
-
-      if (!vidId) {
-        document.getElementById("output").textContent = "❌ لم أتمكن من تحديد الفيديو الأخير";
-        return;
-      }
-
-      // تفاصيل الفيديو
-      const vres = await gapi.client.youtube.videos.list({
-        part: "snippet",
-        id: vidId
-      });
-
-      const snippet = vres.result.items[0].snippet;
-      const text = "العنوان: " + snippet.title + "\nالوصف: " + snippet.description;
-
-      document.getElementById("output").textContent = text;
-
-      // نطق النص
-      let msg = new SpeechSynthesisUtterance(text);
-      msg.lang = "ar-SA";
-      speechSynthesis.speak(msg);
-
-    } catch (err) {
-      console.error("API error:", err);
-      document.getElementById("output").textContent = "❌ حدث خطأ أثناء جلب الفيديو";
+    // تحميل مكتبة gapi
+    function loadClient() {
+      gapi.client.setApiKey(API_KEY); // ← هذه الإضافة فقط
+      return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest");
     }
-  };
 
-  gapi.load("client:auth2", () => {
-    loadClient().then(initClient);
-  });
-</script>
+    function initClient() {
+      gapi.auth2.init({
+        client_id: CLIENT_ID,
+        scope: SCOPES
+      });
+    }
+
+    document.getElementById("login").onclick = async () => {
+      await gapi.auth2.getAuthInstance().signIn();
+      alert("تم تسجيل الدخول ✅");
+    };
+
+    document.getElementById("get").onclick = async () => {
+      try {
+        const response = await gapi.client.youtube.activities.list({
+          part: "snippet,contentDetails",
+          mine: true,
+          maxResults: 1
+        });
+
+        const item = response.result.items[0];
+        let vidId = null;
+
+        if (item.contentDetails.upload) {
+          vidId = item.contentDetails.upload.videoId;
+        } else if (item.contentDetails.playlistItem) {
+          vidId = item.contentDetails.playlistItem.resourceId.videoId;
+        } else if (item.contentDetails.recommendation) {
+          vidId = item.contentDetails.recommendation.resourceId.videoId;
+        }
+
+        if (!vidId) {
+          document.getElementById("output").textContent = "❌ لم أتمكن من تحديد الفيديو الأخير";
+          return;
+        }
+
+        const vres = await gapi.client.youtube.videos.list({
+          part: "snippet",
+          id: vidId
+        });
+
+        const snippet = vres.result.items[0].snippet;
+        const text = "العنوان: " + snippet.title + "\nالوصف: " + snippet.description;
+
+        document.getElementById("output").textContent = text;
+
+        // نطق النص
+        let msg = new SpeechSynthesisUtterance(text);
+        msg.lang = "ar-SA";
+        speechSynthesis.speak(msg);
+
+      } catch (err) {
+        console.error("API error:", err);
+        document.getElementById("output").textContent = "❌ حدث خطأ أثناء جلب الفيديو";
+      }
+    };
+
+    gapi.load("client:auth2", () => {
+      loadClient().then(initClient);
+    });
+  </script>
+</body>
+</html>
