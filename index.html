@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <title>YouTube Helper</title>
+  <script src="https://apis.google.com/js/api.js"></script>
+</head>
+<body>
+  <button id="login">🔑 تسجيل الدخول إلى يوتيوب</button>
+  <button id="get">🎬 جلب آخر فيديو</button>
+  <pre id="output"></pre>
+
+  <script>
+    const CLIENT_ID = "YOUR_CLIENT_ID.apps.googleusercontent.com";
+    const SCOPES = "https://www.googleapis.com/auth/youtube.readonly";
+
+    // تحميل مكتبة gapi
+    function loadClient() {
+      gapi.client.setApiKey(""); // لن نحتاج مفتاح API في حال OAuth
+      return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest");
+    }
+
+    function initClient() {
+      gapi.auth2.init({
+        client_id: CLIENT_ID,
+        scope: SCOPES
+      });
+    }
+
+    document.getElementById("login").onclick = async () => {
+      await gapi.auth2.getAuthInstance().signIn();
+      alert("تم تسجيل الدخول ✅");
+    };
+
+    document.getElementById("get").onclick = async () => {
+      const response = await gapi.client.youtube.activities.list({
+        part: "snippet,contentDetails",
+        mine: true,
+        maxResults: 1
+      });
+      const video = response.result.items[0].contentDetails.upload || response.result.items[0].contentDetails.playlistItem || response.result.items[0].contentDetails;
+      const vidId = response.result.items[0].contentDetails.upload?.videoId 
+                 || response.result.items[0].contentDetails.playlistItem?.videoId 
+                 || response.result.items[0].contentDetails?.videoId;
+
+      // جلب التفاصيل
+      const vres = await gapi.client.youtube.videos.list({
+        part: "snippet",
+        id: vidId
+      });
+
+      const snippet = vres.result.items[0].snippet;
+      const text = "العنوان: " + snippet.title + "\nالوصف: " + snippet.description;
+
+      document.getElementById("output").textContent = text;
+
+      // نطق النص
+      let msg = new SpeechSynthesisUtterance(text);
+      msg.lang = "ar-SA";
+      speechSynthesis.speak(msg);
+    };
+
+    gapi.load("client:auth2", () => {
+      loadClient().then(initClient);
+    });
+  </script>
+</body>
+</html>
