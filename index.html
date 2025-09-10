@@ -14,16 +14,18 @@
   <script> 
   const CLIENT_ID = "453345351977-9k7c7fnh5pqfgpm3pmjq2obq6a481v3b.apps.googleusercontent.com";
   const API_KEY = "AIzaSyDAfXNsg1Kk5cUkg__ToE13fqVp3NeUPCI"; // أضف المفتاح هنا
-    const SCOPES   = "https://www.googleapis.com/auth/youtube.readonly";
+    const SCOPES    = "https://www.googleapis.com/auth/youtube.readonly";
 
     let tokenClient;
     let accessToken = null;
 
+    // Load YouTube API client
     function loadClient() {
       gapi.client.setApiKey(API_KEY);
       return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest");
     }
 
+    // Initialize login client on page load
     window.onload = () => {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
@@ -34,7 +36,7 @@
             return;
           }
           accessToken = resp.access_token;
-          document.getElementById("login").style.display = "none"; // 🔹 إخفاء الزر
+          document.getElementById("login").style.display = "none"; // 🔹 Hide login button after success
           alert("✅ تم تسجيل الدخول بنجاح");
         },
       });
@@ -42,10 +44,12 @@
       gapi.load("client", loadClient);
     };
 
+    // Trigger login flow
     document.getElementById("login").onclick = () => {
-      tokenClient.requestAccessToken({prompt: ''}); // 🔹 prompt فارغ لتقليل تكرار طلب الموافقة
+      tokenClient.requestAccessToken({prompt: ''}); // 🔹 Empty prompt to reduce repeated consent requests
     };
 
+    // Fetch last watched video
     document.getElementById("get").onclick = async () => {
       if (!accessToken) {
         alert("⚠️ الرجاء تسجيل الدخول أولا");
@@ -53,7 +57,7 @@
       }
 
       try {
-        // 🔹 استدعاء قائمة سجل المشاهدة (HL)
+        // 🔹 Attempting to fetch from Watch History playlist (HL)
         const response = await gapi.client.youtube.playlistItems.list({
           part: "snippet,contentDetails",
           playlistId: "HL",
@@ -73,7 +77,7 @@
         const text = "العنوان: " + title + "\nالوصف: " + desc;
         document.getElementById("output").textContent = text;
 
-        // نطق النص
+        // Read text aloud
         let msg = new SpeechSynthesisUtterance(text);
         msg.lang = "ar-SA";
         speechSynthesis.speak(msg);

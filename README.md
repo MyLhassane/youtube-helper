@@ -1,35 +1,43 @@
-# YouTube Video Reader
+YouTube Helper
+🎯 Goal
 
-📖 تطبيق ويب بسيط (HTML + JavaScript) يعمل عبر **GitHub Pages** ليساعد على قراءة عنوان ووصف آخر فيديو تمت مشاهدته على YouTube، مع نطق المحتوى باستخدام **Web Speech API**.
+The original idea of this project was very simple:
+To display and read aloud on a phone the information of the YouTube video currently being watched on a TV or any other device.
+This was meant to help people who cannot easily read the video title, description, or even comments.
 
-## 🎯 الهدف
-المشروع مخصص لمساعدة من يجدون صعوبة في متابعة محتوى الفيديو المكتوب أو المسموع بلغة أخرى.  
-يقوم بجلب بيانات الفيديو (العنوان + الوصف) مباشرة من **YouTube Data API** بعد تسجيل الدخول، ثم قراءتها صوتيًا.
+⚙️ What works
 
-## 🚀 كيفية الاستخدام
-1. افتح [رابط الصفحة](https://mylhassane.github.io/youtube-helper/) (غيّر `mylhassane` إلى اسم المستخدم في GitHub).  
-2. اضغط على زر **🔑 تسجيل الدخول إلى يوتيوب** (OAuth مع Google).  
-3. بعد تسجيل الدخول، اضغط على زر **🎬 جلب آخر فيديو**.  
-4. ستظهر تفاصيل الفيديو (العنوان + الوصف) ويتم نطقها تلقائيًا.  
+✅ Login with Google account using OAuth2.
 
-## ⚙️ الإعداد
-- أنشئ مشروع في [Google Cloud Console](https://console.cloud.google.com/).  
-- فعّل **YouTube Data API v3**.  
-- أنشئ **OAuth Client ID** من نوع **Web Application**.  
-- أضف رابط GitHub Pages إلى:
-  - Authorized JavaScript origins → `https://mylhassane.github.io`
-  - Authorized redirect URIs → `https://mylhassane.github.io/youtube-helper/`
-- انسخ **Client ID** وضعه في ملف `index.html` مكان `YOUR_CLIENT_ID`.
+✅ Fetching some data from YouTube API (e.g., last uploaded video, public activities).
 
-## 🔒 الخصوصية
-- المشروع لا يخزن أي بيانات حساسة.  
-- تسجيل الدخول يتم مباشرة مع Google عبر OAuth.  
-- **Client ID** ليس سريًا ويمكن وضعه علنًا في الكود.  
+✅ Text-to-Speech integration to read title and description aloud.
 
-## 🛠️ التقنيات المستخدمة
-- HTML + JavaScript (Vanilla)  
-- [Google APIs Client Library](https://developers.google.com/api-client-library/javascript/start)  
-- YouTube Data API v3  
-- Web Speech API  
+🚧 What does not work
 
----
+❌ Access to Watch History:
+
+The YouTube Data API does not allow access to the user’s watch history.
+
+Even with full user consent and proper OAuth authentication, the watch history remains restricted.
+
+As a result, the app cannot automatically detect the currently watched video.
+
+😕 Current Status
+
+After multiple iterations and attempts, the project hit a hard limitation: Google’s API restrictions block the very core of the idea.
+This leaves the project incomplete and unable to deliver on its main purpose.
+
+📌 Notes
+
+The code may still serve as a reference for learning how to use Google OAuth2 with the YouTube API.
+
+It can also be useful for other allowed use-cases (channel uploads, activities, video metadata, etc.).
+
+But it will not provide watch history access, which was the heart of this project.
+
+📝 Conclusion
+
+This project is a practical example that shows an important reality:
+👉 Not everything you can access in YouTube’s web interface as a user is available through the official API.
+This contradiction is frustrating, but it demonstrates the limitations faced by independent developers when running into corporate restrictions.
