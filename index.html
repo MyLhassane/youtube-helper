@@ -11,21 +11,19 @@
   <button id="get">🎬 جلب آخر فيديو</button>
   <pre id="output"></pre>
 
-  <script>
-    const CLIENT_ID = "453345351977-9k7c7fnh5pqfgpm3pmjq2obq6a481v3b.apps.googleusercontent.com";
-    const API_KEY = "AIzaSyDAfXNsg1Kk5cUkg__ToE13fqVp3NeUPCI"; // أضف المفتاح هنا
+  <script> 
+  const CLIENT_ID = "453345351977-9k7c7fnh5pqfgpm3pmjq2obq6a481v3b.apps.googleusercontent.com";
+  const API_KEY = "AIzaSyDAfXNsg1Kk5cUkg__ToE13fqVp3NeUPCI"; // أضف المفتاح هنا
     const SCOPES   = "https://www.googleapis.com/auth/youtube.readonly";
 
     let tokenClient;
     let accessToken = null;
 
-    // تحميل مكتبة YouTube
     function loadClient() {
       gapi.client.setApiKey(API_KEY);
       return gapi.client.load("https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest");
     }
 
-    // تجهيز login client
     window.onload = () => {
       tokenClient = google.accounts.oauth2.initTokenClient({
         client_id: CLIENT_ID,
@@ -36,6 +34,7 @@
             return;
           }
           accessToken = resp.access_token;
+          document.getElementById("login").style.display = "none"; // 🔹 إخفاء الزر
           alert("✅ تم تسجيل الدخول بنجاح");
         },
       });
@@ -44,7 +43,7 @@
     };
 
     document.getElementById("login").onclick = () => {
-      tokenClient.requestAccessToken({prompt: 'consent'});
+      tokenClient.requestAccessToken({prompt: ''}); // 🔹 prompt فارغ لتقليل تكرار طلب الموافقة
     };
 
     document.getElementById("get").onclick = async () => {
@@ -54,30 +53,24 @@
       }
 
       try {
-        const response = await gapi.client.youtube.activities.list({
+        // 🔹 استدعاء قائمة سجل المشاهدة (HL)
+        const response = await gapi.client.youtube.playlistItems.list({
           part: "snippet,contentDetails",
-          mine: true,
+          playlistId: "HL",
           maxResults: 1
         });
 
         const item = response.result.items[0];
-        let vidId = item?.contentDetails?.upload?.videoId ||
-                    item?.contentDetails?.playlistItem?.resourceId?.videoId ||
-                    item?.contentDetails?.recommendation?.resourceId?.videoId;
-
-        if (!vidId) {
-          document.getElementById("output").textContent = "❌ لم أتمكن من تحديد الفيديو الأخير";
+        if (!item) {
+          document.getElementById("output").textContent = "❌ لم أجد فيديو في سجل المشاهدة";
           return;
         }
 
-        const vres = await gapi.client.youtube.videos.list({
-          part: "snippet",
-          id: vidId
-        });
+        const vidId = item.contentDetails.videoId;
+        const title = item.snippet.title;
+        const desc  = item.snippet.description;
 
-        const snippet = vres.result.items[0].snippet;
-        const text = "العنوان: " + snippet.title + "\nالوصف: " + snippet.description;
-
+        const text = "العنوان: " + title + "\nالوصف: " + desc;
         document.getElementById("output").textContent = text;
 
         // نطق النص
